@@ -3,17 +3,7 @@
     <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
   </head>
   <body>
-    <a-scene arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;  patternRatio: 0.80;" embedded="" renderer="logarithmicDepthBuffer: true; precision: medium;" vr-mode-ui="enabled: false">
-            <!-- glbファイルの読み込み -->
-            <a-assets>
-                <a-asset-item id="glb-obj" src="maxON.glb"></a-asset-item>
-            </a-assets>
-
-            <!-- マーカーの検出 -->
-            <a-marker preset="custom" type="pattern" url="sample.patt">
-                <a-entity rotation="0 0 0" scale="1,1,1" gltf-model="#glb-obj"></a-entity>
-            </a-marker>
-      
+    <a-scene>
       <a-plane position="0 0 -4" rotation="-90 0 0" width="4" height="4" color="#7BC8A4"></a-plane>
       <a-sky color="#ECECEC"></a-sky>
     </a-scene>
