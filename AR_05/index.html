@@ -10,12 +10,12 @@
     <a-scene embedded arjs vr-mode-ui="enabled: false">
       <a-assets>
         <!-- 3Dモデルを読み込む -->
-        <a-asset-item id="on" src="on2.gltf" scale="1 1 1"></a-asset-item>
+        <a-asset-item id="on" src="on.glb" scale="1 1 1"></a-asset-item>
       </a-assets>
       <!-- マーカーを設定する -->
       <a-marker type="pattern" url="markerON.patt">
         <!-- 3Dモデルを呼び出す -->
-        <a-entity gltf-model="#on" rotation="-90 0 0"></a-entity>
+        <a-entity gltf-model="#on" rotation="0 0 0"></a-entity>
       </a-marker>
       <!-- カメラを追加 -->
       <a-entity camera></a-entity>
