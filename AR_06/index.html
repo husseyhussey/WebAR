@@ -1,25 +1,27 @@
-<!doctype HTML>
 <html>
-<!-- A-Frame ライブラリの読み込み -->
-<script src="https://aframe.io/releases/0.8.2/aframe.min.js"></script>
-<!-- AR.js ライブラリの読み込み -->
-<script src="https://cdn.rawgit.com/jeromeetienne/AR.js/1.5.0/aframe/build/aframe-ar.js"></script>
-<body style='margin:0px; overflow:hidden;'>
-<!-- こっからA-Frame -->
-<a-scene embedded arjs="debugUIEnabled:false;trackingMethod:best;" vr-mode-ui="enabled: false">
-    <!-- オブジェクトファイルとマテリアルファイルを読み込む -->
-    <a-assets>
-        <a-asset-item id="sample-obj" src="model_obj/sample/sample.obj"></a-asset-item>
-        <a-asset-item id="sample-mtl" src="model_obj/sample/sanple.mtl"></a-asset-item>
-    </a-assets>
-　　　　　　　　<!-- こっからARの世界。マーカー上になにを展開するかを書く -->
-    <a-marker preset="hiro">
-        <a-obj-model id="sample" src="#sample-obj" mtl="#sample-mtl" position="0 0 0" scale="0.5 0.5 0.5" rotation="0 0 0"></a-obj-model>
-        <a-text value="Merry X'mas !！！" position="0 1.3 0" align="center"></a-text>
-    </a-marker>
-    <!-- arなのでこんな感じでカメラが必要らしい。 -->
-    <a-entity camera></a-entity>
-</a-scene>
-<!-- ここまででA-Frameおわり -->
-</body>
+  <head>
+    <!-- A-Frameを読み込む -->
+    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+    <!-- AR.jsを読み込む -->
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+  </head>
+  <body style="margin: 0; overflow: hidden">
+    <!-- シーンの作成、VRモードのUI非表示 -->
+    <a-scene embedded arjs vr-mode-ui="enabled: false">
+      <a-assets>
+        <!-- 3Dモデルを読み込む -->
+        <a-asset-item id="on" src="onP.glb" scale="0.1 0.1 0.1"></a-asset-item>
+      </a-assets>
+      <!-- マーカーを設定する -->
+      <a-marker type="pattern" url="markerON.patt">
+        <!-- 3Dモデルを呼び出す -->
+        <a-entity gltf-model="#on" rotation="-10 0 0"></a-entity>
+      </a-marker>
+      <!-- カメラを追加 -->
+      <a-entity camera></a-entity>
+    </a-scene>
+  </body>
+  <script>
+      document.querySelector("a-scene").renderer.gammaOutput=true;
+  </script>
 </html>
