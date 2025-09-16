@@ -4,7 +4,6 @@
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <!-- AR.jsを読み込む -->
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-    <script src="https://cdn.rawgit.com/jeromeetienne/ar.js/2.2.1/aframe/build/aframe-ar.min.js"></script>
   </head>
   <body style="margin: 0; overflow: hidden">
     <!-- シーンの作成、VRモードのUI非表示 -->
@@ -21,42 +20,8 @@
       <!-- カメラを追加 -->
       <a-entity camera></a-entity>
     </a-scene>
-
-    
-    <button id="shutter" style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 10px 20px; font-size: 16px;">シャッター</button>
-    <canvas id="snapshotCanvas" style="display: none;"></canvas>
-
-  
   </body>
   <script>
       document.querySelector("a-scene").renderer.gammaOutput=true;
   </script>
-
-
-<script>
-  document.getElementById('shutter').addEventListener('click', () => {
-    const scene = document.querySelector('a-scene');
-    const canvas = document.getElementById('snapshotCanvas');
-    const context = canvas.getContext('2d');
-
-    // シーンのサイズを取得
-    const width = scene.renderer.domElement.width;
-    const height = scene.renderer.domElement.height;
-
-    // Canvasのサイズを設定
-    canvas.width = width;
-    canvas.height = height;
-
-    // WebGLコンテンツをCanvasに描画
-    context.drawImage(scene.renderer.domElement, 0, 0, width, height);
-
-    // 画像をダウンロード
-    const link = document.createElement('a');
-    link.download = 'snapshot.png';
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-  });
-</script>
-  
-  
 </html>
