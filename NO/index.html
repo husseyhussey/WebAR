@@ -63,7 +63,7 @@
   </head>
   <body style="margin: 0; overflow: hidden">
     <!-- シーンの作成、VRモードのUI非表示 -->
-    <a-scene embedded arjs vr-mode-ui="enabled: false">
+    <a-scene embedded arjs vr-mode-ui="enabled: false" renderer="colorManagement: true">
       <a-assets>
         <!-- 3Dモデルを読み込む -->
         <a-asset-item id="no" src="NOchan.glb" scale="0.03 0.03 0.03"></a-asset-item>
