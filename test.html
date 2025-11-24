@@ -17,7 +17,7 @@
 <br>
 
 <!-- 撮影ボタン -->
-<button id="captureBtn">📸 撮影</button>
+<button id="captureBtn">撮影</button>
 <!-- 保存リンク -->
 <a id="downloadLink" download="photo.png" style="display:none;">画像を保存</a>
 <br><br>
@@ -48,8 +48,8 @@
     // 撮影ボタン押下時
     captureBtn.addEventListener('click', () => {
         const ctx = canvas.getContext('2d');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+        canvas.width = 1920px;
+        canvas.height = 1080px;
         ctx.drawImage(video, 0, 0);
 
         // 画像データURL取得
@@ -58,7 +58,7 @@
         // ダウンロードリンク設定
         downloadLink.href = imageData;
         downloadLink.style.display = 'inline';
-        downloadLink.textContent = "💾 保存する";
+        downloadLink.textContent = "保存する";
     });
 })();
 </script>
@@ -89,4 +89,5 @@ HTTPS環境 または localhost でブラウザから開く（getUserMedia は�
 
 このあと、サーバに送信して保存するNode.js版も作りますか？
 そうすればクラウドやWebアプリで使える形になります。
+
 -->
