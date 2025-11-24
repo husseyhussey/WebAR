@@ -48,8 +48,8 @@
     // 撮影ボタン押下時
     captureBtn.addEventListener('click', () => {
         const ctx = canvas.getContext('2d');
-        canvas.width = 1920px;
-        canvas.height = 1080px;
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
         ctx.drawImage(video, 0, 0);
 
         // 画像データURL取得
@@ -91,3 +91,4 @@ HTTPS環境 または localhost でブラウザから開く（getUserMedia は�
 そうすればクラウドやWebアプリで使える形になります。
 
 -->
+
