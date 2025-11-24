@@ -5,61 +5,93 @@
     <!-- AR.jsを読み込む -->
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <script src="https://cdn.rawgit.com/jeromeetienne/ar.js/2.2.1/aframe/build/aframe-ar.min.js"></script>
-    <link href="//fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
 
 
-    <style>
-        .ui {
-            position: absolute;
-            z-index: 100;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: auto;
-            margin: 0;
-            padding: 10px 15px 30px;
-            text-align: center;
-            box-sizing: border-box;
-        }
-        .ui a {
-            display: inline-block;
-            width: 60px;
-            height: 60px;
-            background-color: #ffffff;
-            line-height: 100%;
-            color: #303030;
-            margin: 10px 3px;
-            border-radius: 50%;
-            position: relative;
 
-        }
-        .ui a i {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%,-50%);
-        }
-        .ui a:active {
-            color: #ff0000;
-        }
+    
+<style>
+body {
+  text-align: center;
+}
 
-        #snap {
-            max-width: 100%;
-            height: auto;
-            display: block;;
-            visibility: hidden;
-        }
-        .ui a.disabled {
-            pointer-events: none;
-            color: #cccccc;
-        }
-        #snap.visible {
-            visibility: visible;
-        }
-    </style>
+.flex-row {
+  display: flex;
+  justify-content: center;
+}
+
+#video {
+  border: 1px solid black;
+  width: 320px;
+  height: 240px;
+}
+
+#photo {
+  border: 1px solid black;
+  width: 320px;
+  height: 240px;
+}
+
+#movie {
+  border: 1px solid black;
+  width: 320px;
+  height: 240px;
+}
+
+#shoot,
+#recode-start,
+#recode-stop {
+  width: 100px;
+  margin: 5px auto;
+  border: solid 1px skyblue;
+  border-radius: 30px;
+  background-color: skyblue;
+}
+
+#shoot:hover,
+#recode-start:hover,
+#recode-stop:hover {
+  opacity: 0.7;
+}
+
+.hidd {
+  display: none;
+}
+
+#recode-stop {
+  animation: recodding 2s infinite;
+}
+
+p.ret-element {
+  margin-top: 0;
+}
+
+@keyframes recodding {
+  0% {
+    opacity: 1;
+    /* border: solid 1px skyblue;
+    background-color: skyblue; */
+  }
+
+  50% {
+    opacity: 0.3;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@media (width <=1000px) {
+  .flex-row {
+    display: block;
+  }
+}
+  </style>
 
 
+
+    
     
   </head>
   <body style="margin: 0; overflow: hidden">
@@ -80,96 +112,81 @@
 
 
 
-    
-  <div class="ui">
-    <img id="snap">
-    <a href="#" id="delete-photo" title="Delete Photo" class="disabled"><i class="material-icons">delete</i></a>
-    <a href="" id="take-photo" title="Take Photo"><i class="material-icons">photo_camera</i></a>
-    <a href="#" id="download-photo" download="selfie.png" title="Save Photo" class="disabled" target="_blank"><i class="material-icons">file_download</i></a>
-  </div>
+    <div class="flex-row">
+        <div class="camera">
+            <video id="video"></video>
+            <div id="shoot">撮影</div>
+        </div>
+        <img id="photo">
+    </div>
+
 
     
-  
   </body>
   <script>
       document.querySelector("a-scene").renderer.gammaOutput=true;
   </script>
 
 
+  
+  
+  
+  <script>
+const video = document.querySelector('#video');
+const canvas = document.createElement('canvas');
 
+initVideoCamera();
+initPhoto();
+document.querySelector('#shoot').addEventListener('click', photoShoot);
 
+/**
+ * ビデオのカメラ設定(デバイスのカメラ映像をビデオに表示)
+ */
+function initVideoCamera() {
+    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+        .then((stream) => {
+            video.srcObject = stream;
+            video.play();
+        })
+        .catch(e => console.log(e));
+}
 
-<script>
-    var image = document.querySelector('#snap');
-    var take_photo_btn = document.querySelector('#take-photo');
-    var delete_photo_btn = document.querySelector('#delete-photo');
-    var download_photo_btn = document.querySelector('#download-photo');
+/**
+ * 写真の初期描画
+ */
+function initPhoto() {
+    canvas.width = video.clientWidth;
+    canvas.height = video.clientHeight;
+    const context = canvas.getContext("2d");
+    context.fillStyle = "#AAA";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    document.querySelector("#photo").src = canvas.toDataURL("image/png");
+}
 
-    //スナップショットボタン
-    take_photo_btn.addEventListener("click", function (e) {
-        e.preventDefault();
-        var video = document.querySelector('video');
-        var snap = takeSnapshot(video);
+/**
+ * 写真の撮影描画
+ */
+function photoShoot() {
+    let drawSize = calcDrawSize();
+    canvas.width = drawSize.width;
+    canvas.height = drawSize.height;
+    const context = canvas.getContext("2d");
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    document.querySelector("#photo").src = canvas.toDataURL("image/png");
+}
 
-        //スナップショット表示.
-        image.setAttribute('src', snap);
-        image.classList.add('visible');
-
-        // 削除ボタンと保存ボタン有効
-        delete_photo_btn.classList.remove("disabled");
-        download_photo_btn.classList.remove("disabled");
-
-        // 保存ボタンにスナップショットを渡す
-        download_photo_btn.href = snap;
-    });
-
-    //削除ボタン
-    delete_photo_btn.addEventListener("click", function(e){
-
-        e.preventDefault();
-
-        // スナップショットを隠す
-        image.setAttribute('src', "");
-        image.classList.remove("visible");
-
-        // 削除ボタンと保存ボタン無効
-        delete_photo_btn.classList.add("disabled");
-        download_photo_btn.classList.add("disabled");
-
-    });
-
-    //スナップショットを撮る
-    function takeSnapshot(video) {
-        var resizedCanvas = document.createElement("canvas");
-        var resizedContext = resizedCanvas.getContext("2d");
-        var width = video.videoWidth;
-        var height = video.videoHeight;
-        var aScene = document.querySelector("a-scene").components.screenshot.getCanvas("perspective");
-
-        if (width && height) {
-            //videoのサイズをキャンバスにセット
-            resizedCanvas.width = width;
-            resizedCanvas.height = height;
-            //キャンバスにvideoをコピー
-            resizedContext.drawImage(video, 0, 0, width, height);
-
-            //カメラの画角でar側の縮小処理を変える
-            if (width > height) {
-                // 横長（PC)
-                resizedContext.drawImage(aScene, 0, 0, width, height);
-            } else {
-                // 縦長（スマホ）
-                var scale = height / width;
-                var scaledWidth = height * scale;
-                var marginLeft = (width - scaledWidth) / 2;
-                resizedContext.drawImage(aScene, marginLeft, 0, scaledWidth, height);
-            }
-            return resizedCanvas.toDataURL('image/png');
-        }
-    }
-
-    //-->
-</script>
+/**
+ * 描画サイズの計算
+ * 縦横比が撮影(video)が大きい時は撮影の縦基準、それ以外は撮影の横基準で計算
+ */
+function calcDrawSize() {
+    let videoRatio = video.videoHeight / video.videoWidth;
+    let viewRatio = video.clientHeight / video.clientWidth;
+    return videoRatio > viewRatio ?
+        { height: video.clientHeight, width: video.clientHeight / videoRatio }
+        : { height: video.clientWidth * videoRatio, width: video.clientWidth }
+}
+  </script>
   
 
 
