@@ -1,0 +1,92 @@
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>カメラ画像保存</title>
+<style>
+  video, canvas {
+    border: 1px solid #ccc;
+    max-width: 100%;
+  }
+</style>
+</head>
+<body>
+<h1>カメラ画像を保存する</h1>
+
+<!-- カメラ映像表示 -->
+<video id="camera" autoplay playsinline></video>
+<br>
+
+<!-- 撮影ボタン -->
+<button id="captureBtn">📸 撮影</button>
+<!-- 保存リンク -->
+<a id="downloadLink" download="photo.png" style="display:none;">画像を保存</a>
+<br><br>
+
+<!-- 撮影画像表示用 -->
+<canvas id="snapshot" style="display:none;"></canvas>
+
+<script>
+(async function() {
+    const video = document.getElementById('camera');
+    const canvas = document.getElementById('snapshot');
+    const captureBtn = document.getElementById('captureBtn');
+    const downloadLink = document.getElementById('downloadLink');
+
+    try {
+        // カメラ映像取得（リアカメラ優先）
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "environment" },
+            audio: false
+        });
+        video.srcObject = stream;
+    } catch (err) {
+        alert("カメラにアクセスできません: " + err.message);
+        console.error(err);
+        return;
+    }
+
+    // 撮影ボタン押下時
+    captureBtn.addEventListener('click', () => {
+        const ctx = canvas.getContext('2d');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0);
+
+        // 画像データURL取得
+        const imageData = canvas.toDataURL('image/png');
+
+        // ダウンロードリンク設定
+        downloadLink.href = imageData;
+        downloadLink.style.display = 'inline';
+        downloadLink.textContent = "💾 保存する";
+    });
+})();
+</script>
+</body>
+</html>
+
+
+
+
+
+<!--
+使い方
+
+上記コードを camera_save.html などのファイル名で保存。
+HTTPS環境 または localhost でブラウザから開く（getUserMedia は安全な環境でのみ動作）。
+ブラウザがカメラアクセス許可を求めるので「許可」。
+「撮影」ボタンを押すと静止画が取得され、「保存する」リンクからPNG形式でダウンロード可能。
+
+
+補足
+
+スマホの場合：facingMode: "environment" で背面カメラを優先。
+保存形式変更：canvas.toDataURL('image/jpeg', 0.9) にすればJPEG形式で保存可能。
+サーバ保存：fetch や XMLHttpRequest で imageData を送信すればサーバ側に保存できます。
+
+
+もし「撮影した画像をサーバに直接送信して保存する」バージョンも必要なら、次にそのコードも作れますが、このコードはブラウザだけで完結して保存できます。
+
+このあと、サーバに送信して保存するNode.js版も作りますか？
+そうすればクラウドやWebアプリで使える形になります。
+-->
