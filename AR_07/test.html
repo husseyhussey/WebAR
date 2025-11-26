@@ -77,7 +77,21 @@
 
                         // canvasにカメラ画像を描いてからglbが映っているsceneを上書き
                         context.drawImage(camera, 0, 0, width, height);
-                        context.drawImage(aScene, 0, 0, width, height);
+
+            if (width > height) {
+                // 横長（PC)
+                context.drawImage(aScene, 0, 0, width, height);
+            } else {
+                // 縦長（スマホ）
+                var scale = height / width;
+                var scaledWidth = height * scale;
+                var marginLeft = (width - scaledWidth) / 2;
+                context.drawImage(aScene, marginLeft, 0, scaledWidth, height);
+            }
+
+
+                      
+//                        context.drawImage(aScene, 0, 0, width, height);
 
                         // png画像を作成
                         var snap = canvas.toDataURL('image/png');
@@ -95,4 +109,5 @@
   
 
 </html>
+
 
