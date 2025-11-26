@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>How to Capture Sceenshot of Page using JavaScript</title>
+<link rel='stylesheet' href='form.css' type='text/css' />
+</head>
+<body>
+    <div class="phppot-container">
+        <p>This uses the WebRTC standard to take screenshot. WebRTC
+            is popular and has support in all major modern browsers. It
+            is used for audio, video communication.</p>
+        <p>getDisplayMedia() is part of WebRTC and is used for
+            screen sharing. Video is rendered and then page screenshot
+            is captured from the video.</p>
+        <p>
+        <p>
+            <button id="capture-screenshot"
+                onclick="captureScreenshot();">Capture
+                Screenshot</button>
+        </p>
+    </div>
+    <script>
+    const captureScreenshot = async () => {
+        const canvas = document.createElement("canvas");
+        const context = canvas.getContext("2d");
+        const screenshot = document.createElement("screenshot");
+    
+        try {
+            const captureStream = await navigator.mediaDevices.getDisplayMedia();
+            screenshot.srcObject = captureStream;
+            context.drawImage(screenshot, 0, 0, window.width, window.height);
+            const frame = canvas.toDataURL("image/png");
+            captureStream.getTracks().forEach(track => track.stop());
+            window.location.href = frame;
+        } catch (err) {
+            console.error("Error: " + err);
+        }
+    };
+    </script>
+</body>
+</html>
