@@ -1,41 +1,57 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-<title>How to Capture Sceenshot of Page using JavaScript</title>
-<link rel='stylesheet' href='form.css' type='text/css' />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>スクリーンショットの基本</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        #screenshotArea {
+            width: 80%;
+            height: 300px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            margin: 20px auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #screenshotImage {
+            max-width: 100%;
+            margin-top: 20px;
+            border: 1px solid #ddd;
+        }
+    </style>
 </head>
 <body>
-    <div class="phppot-container">
-        <p>This uses the WebRTC standard to take screenshot. WebRTC
-            is popular and has support in all major modern browsers. It
-            is used for audio, video communication.</p>
-        <p>getDisplayMedia() is part of WebRTC and is used for
-            screen sharing. Video is rendered and then page screenshot
-            is captured from the video.</p>
-        <p>
-        <p>
-            <button id="capture-screenshot"
-                onclick="captureScreenshot();">Capture
-                Screenshot</button>
-        </p>
+    <h1>スクリーンショットを撮ってみよう！</h1>
+    <div id="screenshotArea">
+        <p>ここに表示されている内容をスクリーンショットします。</p>
+        <p>いろんな文字や画像を入れてみてくださいね。</p>
+        <img src="https://via.placeholder.com/150" alt="サンプル画像">
     </div>
+    <button onclick="takeScreenshot()">スクリーンショットを撮る</button>
+    <h2>撮れた画像</h2>
+    <img id="screenshotImage" alt="スクリーンショット">
+
     <script>
-    const captureScreenshot = async () => {
-        const canvas = document.createElement("canvas");
-        const context = canvas.getContext("2d");
-        const screenshot = document.createElement("screenshot");
-    
-        try {
-            const captureStream = await navigator.mediaDevices.getDisplayMedia();
-            screenshot.srcObject = captureStream;
-            context.drawImage(screenshot, 0, 0, window.width, window.height);
-            const frame = canvas.toDataURL("image/png");
-            captureStream.getTracks().forEach(track => track.stop());
-            window.location.href = frame;
-        } catch (err) {
-            console.error("Error: " + err);
+        function takeScreenshot() {
+            html2canvas(document.body).then(function(canvas) {
+                // スクリーンショットされたCanvasを画像として表示
+                const img = document.getElementById('screenshotImage');
+                img.src = canvas.toDataURL('image/png');
+                console.log("スクリーンショットが撮れました！");
+            });
         }
-    };
     </script>
 </body>
 </html>
