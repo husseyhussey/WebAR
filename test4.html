@@ -1,55 +1,141 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-<title>How to Capture Screenshot of Page using JavaScript</title>
-<link rel='stylesheet' href='form.css' type='text/css' />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>範囲選択スクリーンショット</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        #contentToScreenshot {
+            width: 80%;
+            height: 400px;
+            background-color: #e6f7ff;
+            border: 2px dashed #007bff;
+            margin: 20px auto;
+            padding: 20px;
+            box-sizing: border-box;
+            position: relative; /* Canvasを重ねるため */
+            overflow: hidden; /* 選択範囲がはみ出さないように */
+        }
+        #overlayCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            cursor: crosshair;
+            z-index: 1000; /* 最前面に表示 */
+        }
+        #screenshotImage {
+            max-width: 100%;
+            margin-top: 20px;
+            border: 1px solid #ddd;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
-    <div class="phppot-container">
-        <h1>How to Capture Screenshot of Page using JavaScript</h1>
-        <p>
-            <button id="capture-screenshot">Capture Screenshot</button>
-        </p>
+    <h1>範囲選択でスクリーンショット！</h1>
+    <p>ドラッグしてスクリーンショット範囲を選択してください。</p>
+    <div id="contentToScreenshot">
+        <p>ここにスクリーンショットしたいコンテンツがあります。</p>
+        <p>可愛い水着の画像とか、置いてみましょう！</p>
+        <img src="https://via.placeholder.com/200x150/FFC0CB/FFFFFF?text=CuteSwimsuit" alt="かわいい水着">
+        <p>いろいろな要素を配置できます。</p>
+        <canvas id="overlayCanvas"></canvas>
     </div>
+    <button onclick="takePartialScreenshot()">選択範囲をスクリーンショット</button>
+    <h2>撮れた画像</h2>
+    <img id="screenshotImage" alt="部分スクリーンショット">
 
-    <script
-    src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script type="text/javascript"
-    src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-    <script type="text/javascript">  
-        $('#capture-screenshot').click(function() {
-            const screenshotTarget = document.body;
-            html2canvas(screenshotTarget).then(canvas => {
-                // to image as png use below line
-                // const base64image = canvas.toDataURL("image/png");
-                // show the image in window use below line
-                // window.location.href = base64image;
-                
-                // screenshot appended to the body as canvas
-                document.body.appendChild(canvas);  
-                dataURL = canvas.toDataURL();  
-                // to print the screenshot in console use below line
-                // console.log(dataURL);
-                
-                // following line is optional and it is to save the screenshot
-                // on the server side. It initiates an ajax call
-                pushScreenshotToServer(dataURL); 
-            });  
+    <script>
+        const contentToScreenshot = document.getElementById('contentToScreenshot');
+        const overlayCanvas = document.getElementById('overlayCanvas');
+        const ctx = overlayCanvas.getContext('2d');
+        let isDrawing = false;
+        let startX, startY;
+        let rect = {}; // 選択範囲の座標とサイズ
+
+        // Canvasのサイズを親要素に合わせる
+        function setCanvasSize() {
+            overlayCanvas.width = contentToScreenshot.offsetWidth;
+            overlayCanvas.height = contentToScreenshot.offsetHeight;
+        }
+        setCanvasSize();
+        window.addEventListener('resize', setCanvasSize); // ウィンドウリサイズ時にも調整
+
+        overlayCanvas.addEventListener('mousedown', (e) => {
+            isDrawing = true;
+            // 親要素からの相対座標を計算
+            const rect = contentToScreenshot.getBoundingClientRect();
+            startX = e.clientX - rect.left;
+            startY = e.clientY - rect.top;
         });
-  
-        function pushScreenshotToServer(dataURL) {  
-            $.ajax({ 
-                url: "push-screenshot.php",  
-                type: "POST",  
-                data: {  
-                    image: dataURL  
-                },  
-                dataType: "html", 
-                success: function() {  
-                    console.log('Screenshot pushed to server.');
-                }  
-            });  
-        }  
+
+        overlayCanvas.addEventListener('mousemove', (e) => {
+            if (!isDrawing) return;
+            ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height); // 前回描画をクリア
+
+            const rectParent = contentToScreenshot.getBoundingClientRect();
+            const currentX = e.clientX - rectParent.left;
+            const currentY = e.clientY - rectParent.top;
+
+            // 矩形を描画
+            ctx.strokeStyle = 'red';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(startX, startY, currentX - startX, currentY - startY);
+
+            // 選択範囲の座標を更新
+            rect = {
+                x: Math.min(startX, currentX),
+                y: Math.min(startY, currentY),
+                width: Math.abs(currentX - startX),
+                height: Math.abs(currentY - startY)
+            };
+        });
+
+        overlayCanvas.addEventListener('mouseup', () => {
+            isDrawing = false;
+            // 選択範囲の矩形を確定
+        });
+
+        function takePartialScreenshot() {
+            if (rect.width === 0 || rect.height === 0) {
+                alert("選択範囲が指定されていません。ドラッグして範囲を選択してください。");
+                return;
+            }
+
+            html2canvas(contentToScreenshot).then(function(canvas) {
+                const screenshotCtx = canvas.getContext('2d');
+                const imageData = screenshotCtx.getImageData(rect.x, rect.y, rect.width, rect.height);
+
+                // 新しいCanvasを作成し、切り出した画像をそこに描画
+                const newCanvas = document.createElement('canvas');
+                newCanvas.width = rect.width;
+                newCanvas.height = rect.height;
+                const newCtx = newCanvas.getContext('2d');
+                newCtx.putImageData(imageData, 0, 0);
+
+                const img = document.getElementById('screenshotImage');
+                img.src = newCanvas.toDataURL('image/png');
+                console.log("選択範囲のスクリーンショットが撮れました！");
+
+                // 選択範囲の表示をクリア
+                ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+                rect = {}; // 選択範囲をリセット
+            }).catch(error => {
+                console.error("スクリーンショットの取得中にエラーが発生しました:", error);
+                alert("スクリーンショットの取得に失敗しました。");
+            });
+        }
     </script>
 </body>
 </html>
