@@ -72,18 +72,42 @@
 
 
     <button onclick="takeScreenshot()">スクリーンショットを撮る</button>
-    <img id="screenshotImage" alt="スクリーンショット">
+<script>
+    document.getElementById("screenshot-button").addEventListener("click", function() {
+        html2canvas(document.body).then(function(canvas) {
+            // カメラ画像を取得する為、AR.jsで展開されているvideoを取得
+            var camera = document.querySelector('video');
+            // 空のキャンバスを用意
+            var canvas = document.createElement("canvas");
+            var context = canvas.getContext("2d");
+            
+            var width = camera.videoWidth;
+            var height = camera.videoHeight;
 
-    <script>
-        function takeScreenshot() {
-            html2canvas(document.body).then(function(canvas) {
-                // スクリーンショットされたCanvasを画像として表示
-                const img = document.getElementById('screenshotImage');
-                img.src = canvas.toDataURL('image/png');
-                console.log("スクリーンショットが撮れました！");
-            });
-        }
-    </script>
+            // A-Frameで描画しているSceneを取得
+            var aScene = document.querySelector("a-scene").components.screenshot.getCanvas("perspective");
+
+            if (width && height) {
+                // カメラのサイズをcanvasにセット
+                canvas.width = width;
+                canvas.height = height;
+
+                // canvasにカメラ画像を描いてからglbが映っているsceneを上書き
+                context.drawImage(camera, 0, 0, width, height);
+                context.drawImage(aScene, 0, 0, width, height);
+
+                // png画像を作成
+                var snap = canvas.toDataURL('image/png');
+                var link = document.createElement("a");
+                link.href = snap;
+                link.download = "screenshot.png";
+
+                //自動ダウンロード(クリック)
+                link.click();
+            }
+        });
+    });
+</script>
 
 
 
@@ -93,6 +117,7 @@
   
   </body>
 </html>
+
 
 
 
