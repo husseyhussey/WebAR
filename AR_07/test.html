@@ -50,32 +50,44 @@
 
 
 
-  <a href="" id="ss" download="onAR_photo.png">スクリーンショット(document.body全体)をダウンロード</a>
+  <button id="screenshot-button"></button>
 
-  <script>
-    //ロードされた際の処理として実施：
-    window.onload = function(){
+<script>
+    document.getElementById("screenshot-button").addEventListener("click", function() {
+        html2canvas(document.body).then(function(canvas) {
+            // カメラ画像を取得する為、AR.jsで展開されているvideoを取得
+            var camera = document.querySelector('video');
+            // 空のキャンバスを用意
+            var canvas = document.createElement("canvas");
+            var context = canvas.getContext("2d");
+            
+            var width = camera.videoWidth;
+            var height = camera.videoHeight;
 
-      //HTML内に画像を表示
-      html2canvas(document.getElementById("target"),{
-        onrendered: function(canvas){
-          //imgタグのsrcの中に、html2canvasがレンダリングした画像を指定する。
-          var imgData = canvas.toDataURL();
-          document.getElementById("result").src = imgData;
-        }
-      });
+            // A-Frameで描画しているSceneを取得
+            var aScene = document.querySelector("a-scene").components.screenshot.getCanvas("perspective");
 
-      //ボタンを押下した際にダウンロードする画像を作る
-      html2canvas(document.body,{
-        onrendered: function(canvas){
-          //aタグのhrefにキャプチャ画像のURLを設定
-          var imgData = canvas.toDataURL();
-          document.getElementById("ss").href = imgData;
-        }
-      });
+            if (width && height) {
+                // カメラのサイズをcanvasにセット
+                canvas.width = width;
+                canvas.height = height;
 
-    }
-  </script>
+                // canvasにカメラ画像を描いてからglbが映っているsceneを上書き
+                context.drawImage(camera, 0, 0, width, height);
+                context.drawImage(aScene, 0, 0, width, height);
+
+                // png画像を作成
+                var snap = canvas.toDataURL('image/png');
+                var link = document.createElement("a");
+                link.href = snap;
+                link.download = "screenshot.png";
+
+                //自動ダウンロード(クリック)
+                link.click();
+            }
+        });
+    });
+</script>
 
 
 
@@ -83,6 +95,7 @@
   
   </body>
 </html>
+
 
 
 
