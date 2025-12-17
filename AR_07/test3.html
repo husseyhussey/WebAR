@@ -1,0 +1,118 @@
+<html>
+  <head>
+    <!-- A-Frameを読み込む -->
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <!-- AR.jsを読み込む -->
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <script src="https://cdn.rawgit.com/jeromeetienne/ar.js/2.2.1/aframe/build/aframe-ar.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="./ios"></script>
+
+
+    <link href="//fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <style type="text/css">
+            #screenshot-button {
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                background-color: #f3f3f3;
+                border: none;
+                cursor: pointer;
+                outline: none;
+                box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
+            }
+        </style>
+
+
+    
+  </head>
+  <body style="margin: 0; overflow: hidden">
+    <!-- シーンの作成、VRモードのUI非表示 -->
+    <a-scene embedded arjs="patternRatio: 0.75" vr-mode-ui="enabled: false" renderer="colorManagement: true">
+      <a-assets>
+        <!-- 3Dモデルを読み込む -->
+        <a-asset-item id="on" src="ONchan.glb" scale="0.02 0.02 0.02"></a-asset-item>
+      </a-assets>
+      <!-- マーカーを設定する -->
+      <a-marker type="pattern" url="markerON.patt">
+        <!-- 3Dモデルを呼び出す -->
+        <a-entity gltf-model="#on" rotation="0 0 0"></a-entity>
+      </a-marker>
+      <!-- カメラを追加 -->
+      <a-entity camera></a-entity>
+    </a-scene>
+
+
+
+
+
+  <button id="screenshot-button"></button>
+
+<script>
+    document.getElementById("screenshot-button").addEventListener("click", function() {
+        html2canvas(document.body).then(function(canvas) {
+            // カメラ画像を取得する為、AR.jsで展開されているvideoを取得
+            var camera = document.querySelector('video');
+            // 空のキャンバスを用意
+            var canvas = document.createElement("canvas");
+            var context = canvas.getContext("2d");
+            
+            var width = camera.videoWidth;
+            var height = camera.videoHeight;
+
+            // A-Frameで描画しているSceneを取得
+            var aScene = document.querySelector("a-scene").components.screenshot.getCanvas("perspective");
+
+            if (width && height) {
+                // カメラのサイズをcanvasにセット
+                canvas.width = width;
+                canvas.height = height;
+
+                // canvasにカメラ画像を描いてからglbが映っているsceneを上書き
+                context.drawImage(camera, 0, 0, width, height);
+                context.drawImage(aScene, 0, 0, width, height);
+
+
+
+
+            //カメラの画角でar側の縮小処理を変える
+            if (width > height) {
+                // 横長（PC)
+                context.drawImage(aScene, 0, 0, width, height);
+            } else {
+                // 縦長（スマホ）
+                var scale = height / width;
+                var scaledWidth = height * scale;
+                var marginLeft = (width - scaledWidth) / 2;
+                context.drawImage(aScene, marginLeft, 0, scaledWidth, height);
+            }
+
+
+
+
+                // png画像を作成
+                var snap = canvas.toDataURL('image/png');
+                var link = document.createElement("a");
+                link.href = snap;
+                link.download = "screenshot.png";
+
+                //自動ダウンロード(クリック)
+                link.click();
+            }
+        });
+    });
+</script>
+
+
+
+
+
+
+    
+  
+  </body>
+</html>
